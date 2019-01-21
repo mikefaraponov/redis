@@ -1523,32 +1523,52 @@ func (c *ClusterClient) txPipelineReadQueued(
 }
 
 func (c *ClusterClient) pubSub(channels []string) *PubSub {
-	var node *clusterNode
+	var mu sync.Mutex
+	nodes := make(map[*pool.Conn]*clusterNode)
+
 	pubsub := &PubSub{
 		opt: c.opt.clientOptions(),
 
 		newConn: func(channels []string) (*pool.Conn, error) {
-			if node == nil {
-				var slot int
-				if len(channels) > 0 {
-					slot = hashtag.Slot(channels[0])
-				} else {
-					slot = -1
-				}
-
-				masterNode, err := c.slotMasterNode(slot)
-				if err != nil {
-					return nil, err
-				}
-				node = masterNode
+			var slot int
+			if len(channels) > 0 {
+				slot = hashtag.Slot(channels[0])
+			} else {
+				slot = -1
 			}
-			return node.Client.newConn()
+
+			node, err := c.slotMasterNode(slot)
+			if err != nil {
+				return nil, err
+			}
+
+			cn, err := node.Client.newConn()
+			if err != nil {
+				return nil, err
+			}
+
+			mu.Lock()
+			nodes[cn] = node
+			mu.Unlock()
+
+			return cn, nil
 		},
 		closeConn: func(cn *pool.Conn) error {
+			mu.Lock()
+			node, ok := nodes[cn]
+			if ok {
+				delete(nodes, cn)
+			}
+			mu.Unlock()
+
+			if !ok {
+				return fmt.Errorf("can't find matching node for the connection")
+			}
 			return node.Client.connPool.CloseConn(cn)
 		},
 	}
 	pubsub.init()
+
 	return pubsub
 }
 
