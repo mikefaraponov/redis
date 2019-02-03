@@ -162,8 +162,8 @@ func (c *baseClient) Do(args ...interface{}) *Cmd {
 	return cmd
 }
 
-func (c *Client) Custom(args ...interface{}) *Cmd {
-	return c.Do()
+func (c *Client) Go(args ...interface{}) *Cmd {
+	return c.Do(args)
 }
 
 // WrapProcess wraps function that processes Redis commands.
