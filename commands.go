@@ -59,7 +59,7 @@ type Cmdable interface {
 
 	Command() *CommandsInfoCmd
 	ClientGetName() *StringCmd
-	Custom(args ...interface{}) *Cmd
+	Go(args ...interface{}) *Cmd
 	Echo(message interface{}) *StringCmd
 	Ping() *StatusCmd
 	Quit() *StatusCmd
@@ -335,7 +335,7 @@ func (c *statefulCmdable) Auth(password string) *StatusCmd {
 	return cmd
 }
 
-func (c *statefulCmdable) Custom(args ...interface{}) *Cmd {
+func (c *statefulCmdable) Go(args ...interface{}) *Cmd {
 	cmd := NewCmd(args...)
 	c.process(cmd)
 	return cmd
@@ -347,7 +347,7 @@ func (c *cmdable) Echo(message interface{}) *StringCmd {
 	return cmd
 }
 
-func (c *cmdable) Custom(args ...interface{}) *Cmd {
+func (c *cmdable) Go(args ...interface{}) *Cmd {
 	cmd := NewCmd(args...)
 	c.process(cmd)
 	return cmd
