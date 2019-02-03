@@ -347,6 +347,12 @@ func (c *cmdable) Echo(message interface{}) *StringCmd {
 	return cmd
 }
 
+func (c *cmdable) Custom(args ...interface{}) *Cmd {
+	cmd := NewCmd(args...)
+	c.process(cmd)
+	return cmd
+}
+
 func (c *cmdable) Ping() *StatusCmd {
 	cmd := NewStatusCmd("ping")
 	c.process(cmd)
