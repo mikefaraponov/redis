@@ -156,12 +156,15 @@ func (c *baseClient) initConn(cn *pool.Conn) error {
 	return nil
 }
 
-// Custom creates a Cmd from the args and processes the cmd.
-// func (c *baseClient) Custom(args ...interface{}) *Cmd {
-// 	cmd := NewCmd(args...)
-// 	_ = c.Process(cmd)
-// 	return cmd
-// }
+func (c *baseClient) Do(args ...interface{}) *Cmd {
+	cmd := NewCmd(args...)
+	_ = c.Process(cmd)
+	return cmd
+}
+
+func (c *Client) Custom(args ...interface{}) *Cmd {
+	return c.Do()
+}
 
 // WrapProcess wraps function that processes Redis commands.
 func (c *baseClient) WrapProcess(
@@ -533,6 +536,7 @@ func (c *Client) PSubscribe(channels ...string) *PubSub {
 	}
 	return pubsub
 }
+
 
 //------------------------------------------------------------------------------
 
