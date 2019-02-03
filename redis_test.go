@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/mikefaraponov/redis"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
