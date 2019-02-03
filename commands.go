@@ -49,14 +49,17 @@ func appendArgs(dst, src []interface{}) []interface{} {
 }
 
 type Cmdable interface {
+	
 	Pipeline() Pipeliner
 	Pipelined(fn func(Pipeliner) error) ([]Cmder, error)
 
 	TxPipelined(fn func(Pipeliner) error) ([]Cmder, error)
 	TxPipeline() Pipeliner
-
+	
+	
 	Command() *CommandsInfoCmd
 	ClientGetName() *StringCmd
+	Do(args ...interface{}) *Cmd
 	Echo(message interface{}) *StringCmd
 	Ping() *StatusCmd
 	Quit() *StatusCmd
@@ -328,6 +331,12 @@ func (c *statefulCmdable) setProcessor(fn func(Cmder) error) {
 
 func (c *statefulCmdable) Auth(password string) *StatusCmd {
 	cmd := NewStatusCmd("auth", password)
+	c.process(cmd)
+	return cmd
+}
+
+func (c *statefulCmdable) Do(args ...interface{}) *Cmd {
+	cmd := NewCmd(args...)
 	c.process(cmd)
 	return cmd
 }
